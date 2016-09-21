@@ -1,6 +1,6 @@
 # Rulers
 
-Это учебный gem по книге Noah Gibbs'а Rebuilding Rails. Версия книги: Aug 4, 2013
+Это учебный gem по книге Noah Gibbs'а "Rebuilding Rails". Версия книги: Aug 4, 2013
 
 ## Installation
 
