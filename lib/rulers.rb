@@ -2,6 +2,7 @@ require "rulers/version"
 require "rulers/routing"
 require "rulers/util"
 require "rulers/dependencies"
+require "rulers/controller"
 
 module Rulers
   class Application
@@ -20,16 +21,6 @@ module Rulers
       rescue
         return [200, {'Content-Type' => 'text/html'}, ['Sorry, something went wrong...']]
       end
-    end
-  end
-
-  class Controller
-    def initialize(env)
-      @env = env
-    end
-
-    def env
-      @env
     end
   end
 end
