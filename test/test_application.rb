@@ -1,13 +1,5 @@
 require_relative 'test_helper'
-
-class TestsController < Rulers::Controller
-  def index
-    render :index
-  end
-end
-
-class TestApp < Rulers::Application
-end
+require_relative '../app/application'
 
 class RulersAppTest < Test::Unit::TestCase
   include Rack::Test::Methods

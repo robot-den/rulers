@@ -14,11 +14,18 @@ module Rulers
       filename = File.join 'app', 'views', "#{controller_name}","#{view_name}.html.erb"
       template = File.read filename
       eruby = Erubis::Eruby.new template
-      eruby.result locals.merge(env: env)
+      pass_controller_instance_variables_to eruby
+      eruby.result locals
     end
 
     def controller_name
       Rulers.to_underscore self.class.to_s.gsub /Controller$/, ''
+    end
+
+    private
+
+    def pass_controller_instance_variables_to eruby
+      instance_variables.each {|var| eruby.instance_variable_set var, instance_variable_get(var) }
     end
   end
 end
