@@ -13,5 +13,6 @@ class RulersAppTest < Test::Unit::TestCase
 
     assert last_response.ok?
     assert last_response.body['Hello']
+    assert last_response.body['Rulers!!!']
   end
 end
