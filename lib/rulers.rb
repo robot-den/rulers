@@ -3,6 +3,7 @@ require "rulers/routing"
 require "rulers/util"
 require "rulers/dependencies"
 require "rulers/controller"
+require "rulers/file_model"
 
 module Rulers
   class Application
@@ -15,12 +16,12 @@ module Rulers
       return [301, {'Content-Type' => 'text/html', 'Location' => 'http://localhost:3001/quotes/a_quote'}, []] if env['PATH_INFO'] == '/'
       klass, act = get_controller_and_action(env)
       controller = klass.new(env)
-      begin
+      # begin
         text = controller.send(act)
         [200, {'Content-Type' => 'text/html'}, [text]]
-      rescue
-        return [200, {'Content-Type' => 'text/html'}, ['Sorry, something went wrong...']]
-      end
+      # rescue
+      #   return [200, {'Content-Type' => 'text/html'}, ['Sorry, something went wrong...']]
+      # end
     end
   end
 end
