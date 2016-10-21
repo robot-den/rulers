@@ -18,38 +18,45 @@ module Rulers
         @hash[name.to_s] = value
       end
 
-      def self.find(id)
-        begin
-          FileModel.new("db/quotes/#{id}.json")
-        rescue
-          nil
+      class << self
+        def find(id)
+          begin
+            FileModel.new("db/quotes/#{id}.json")
+          rescue
+            nil
+          end
         end
-      end
 
-      def self.all
-        files = Dir["db/quotes/*.json"]
-        files.map { |f| FileModel.new f }
-      end
+        def all
+          files = Dir["db/quotes/*.json"]
+          files.map { |f| FileModel.new f }
+        end
 
-      def self.create(attrs)
-        hash = {}
-        hash[:submitter] = attrs["submitter"] || ""
-        hash[:quote] = attrs["quote"] || ""
-        hash[:attribution] = attrs["attribution"] || ""
+        def create(attrs)
+          hash = {}
+          hash[:submitter] = attrs["submitter"] || ""
+          hash[:quote] = attrs["quote"] || ""
+          hash[:attribution] = attrs["attribution"] || ""
 
-        files = Dir["db/quotes/*.json"]
-        max_id = files.map { |f| File.basename(f, '.json').to_i }.max
-        new_file = "db/quotes/#{max_id + 1}.json"
-        File.open(new_file, 'w') do |f|
-          f.write <<TEMPLATE
+          files = Dir["db/quotes/*.json"]
+          max_id = files.map { |f| File.basename(f, '.json').to_i }.max
+          new_file = "db/quotes/#{max_id + 1}.json"
+          File.open(new_file, 'w') do |f|
+            f.write <<TEMPLATE
 {
   "submitter": "#{hash[:submitter]}",
   "quote": "#{hash[:quote]}",
   "attribution": "#{hash[:attribution]}"
 }
 TEMPLATE
+          end
+          FileModel.new(new_file)
         end
-        FileModel.new(new_file)
+      end
+
+      def update
+        File.open(@filename, 'w') { |f| f.write MultiJson.dump(@hash) }
+        FileModel.new(@filename)
       end
     end
   end

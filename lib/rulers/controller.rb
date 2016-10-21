@@ -28,7 +28,9 @@ module Rulers
     private
 
     def pass_controller_instance_variables_to eruby
-      instance_variables.each {|var| eruby.instance_variable_set var, instance_variable_get(var) }
+      if instance_variables
+        instance_variables.each {|var| eruby.instance_variable_set var, instance_variable_get(var) }
+      end
     end
   end
 end
