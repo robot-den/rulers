@@ -3,11 +3,14 @@ require 'multi_json'
 module Rulers
   module Model
     class FileModel
+      @@cache = {}
+
       def initialize(filename)
         @filename = filename
         @id = File.basename(filename, '.json').to_i
         obj = File.read(filename)
         @hash = MultiJson.load(obj)
+        @cache = {}
       end
 
       def [](name)
@@ -21,7 +24,7 @@ module Rulers
       class << self
         def find(id)
           begin
-            FileModel.new("db/quotes/#{id}.json")
+            @@cache[id] ||= FileModel.new("db/quotes/#{id}.json")
           rescue
             nil
           end
@@ -51,6 +54,27 @@ module Rulers
 TEMPLATE
           end
           FileModel.new(new_file)
+        end
+
+        def find_all_by_attr(attribute, value)
+          if ['submitter', 'quote', 'attribution'].include?(attribute)
+            all.select { |f| f[attribute] == value }
+          else
+            raise "Undefined attribute: #{attribute}"
+          end
+        end
+
+        def method_missing(method_name, *args, &block)
+          match = method_name.to_s.match(/^find_all_by_(.*)/)
+          if match
+            find_all_by_attr(match[1], args[0])
+          else
+            super
+          end
+        end
+
+        def respond_to_missing?(method_name, include_private = false)
+          method_name.to_s.match(/^find_all_by_(.*)/) || super
         end
       end
 
