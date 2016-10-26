@@ -3,6 +3,7 @@ require 'multi_json'
 module Rulers
   module Model
     class FileModel
+      ATTRS = ['submitter', 'quote', 'attribution']
       @@cache = {}
 
       def initialize(filename)
@@ -37,10 +38,7 @@ module Rulers
 
         def create(attrs)
           hash = {}
-          hash[:submitter] = attrs["submitter"] || ""
-          hash[:quote] = attrs["quote"] || ""
-          hash[:attribution] = attrs["attribution"] || ""
-
+          ATTRS.each { |a| hash[a.to_sym] = attrs[a] || '' }
           files = Dir["db/quotes/*.json"]
           max_id = files.map { |f| File.basename(f, '.json').to_i }.max
           new_file = "db/quotes/#{max_id + 1}.json"
@@ -57,7 +55,7 @@ TEMPLATE
         end
 
         def find_all_by_attr(attribute, value)
-          if ['submitter', 'quote', 'attribution'].include?(attribute)
+          if ATTRS.include?(attribute)
             all.select { |f| f[attribute] == value }
           else
             raise "Undefined attribute: #{attribute}"
@@ -80,7 +78,7 @@ TEMPLATE
 
       def update
         File.open(@filename, 'w') { |f| f.write MultiJson.dump(@hash) }
-        FileModel.new(@filename)
+        @@cache[@id] = FileModel.new(@filename)
       end
     end
   end
