@@ -5,7 +5,7 @@ DB = SQLite3::Database.new 'db/database.db'
 
 module Rulers
   module Model
-    class SQLite3Model
+    class SQLite3
       def self.table
         Rulers.to_underscore name
       end
