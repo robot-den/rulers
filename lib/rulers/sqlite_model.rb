@@ -10,6 +10,23 @@ module Rulers
         @hash = data
       end
 
+      def self.find(id)
+        row = DB.execute <<SQL
+SELECT #{schema.keys.join(',')} from #{table}
+WHERE id = #{id};
+SQL
+        data = Hash[schema.keys.zip row[0]]
+        self.new data
+      end
+
+      def [](name)
+        @hash[name.to_s]
+      end
+
+      def []=(name, value)
+        @hash[name.to_s] = value
+      end
+
       def self.to_sql(val)
         case val
         when Numeric
@@ -42,7 +59,7 @@ SQL
 SELECT COUNT(*) FROM #{table}
 SQL
       end
-      
+
       def self.table
         Rulers.to_underscore name
       end
