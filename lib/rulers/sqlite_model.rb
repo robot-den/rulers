@@ -10,11 +10,20 @@ module Rulers
         @hash = data
       end
 
+      def method_missing(method)
+        if @hash.keys.include?(method.to_s)
+          # when env loaded, we define method only once, and then use new method. Cool!
+          self.class.class_eval do
+            define_method(method) { @hash[method.to_s] }
+          end
+          return @hash[method.to_s]
+        else
+          super
+        end
+      end
+
       def self.find(id)
-        row = DB.execute <<SQL
-SELECT #{schema.keys.join(',')} from #{table}
-WHERE id = #{id};
-SQL
+        row = DB.execute "SELECT #{schema.keys.join(',')} from #{table} WHERE id = #{id};"
         data = Hash[schema.keys.zip row[0]]
         self.new data
       end
@@ -41,13 +50,8 @@ SQL
       def self.create(values)
         values.delete 'id'
         keys = schema.keys - ['id']
-        vals = keys.map do |key|
-          values[key] ? to_sql(values[key]) : 'null'
-        end
-        DB.execute <<SQL
-INSERT INTO #{table} (#{keys.join(',')})
-  VALUES (#{vals.join(',')});
-SQL
+        vals = keys.map { |key| values[key] ? to_sql(values[key]) : 'null' }
+        DB.execute "INSERT INTO #{table} (#{keys.join(',')}) VALUES (#{vals.join(',')});"
         data = Hash[keys.zip vals]
         sql = "SELECT last_insert_rowid();"
         data['id'] = DB.execute(sql)[0][0]
@@ -55,9 +59,7 @@ SQL
       end
 
       def self.count
-        DB.execute(<<SQL)[0][0]
-SELECT COUNT(*) FROM #{table}
-SQL
+        DB.execute("SELECT COUNT(*) FROM #{table}")[0][0]
       end
 
       def self.table
@@ -67,10 +69,22 @@ SQL
       def self.schema
         return @schema if @schema
         @schema = {}
-        DB.table_info(table) do |row|
-          @schema[row['name']] = row['type']
-        end
+        DB.table_info(table) { |row| @schema[row['name']] = row['type'] }
         @schema
+      end
+
+      def save!
+        unless @hash['id']
+          self.class.create
+          return true
+        end
+        fields = @hash.map { |k, v| "#{k}=#{self.class.to_sql(v)}" }.join(',')
+        DB.execute "UPDATE #{self.class.table} SET #{fields} WHERE id = #{@hash['id']}"
+        true
+      end
+
+      def save
+        self.save! rescue false
       end
     end
   end
