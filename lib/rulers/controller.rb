@@ -8,6 +8,7 @@ module Rulers
 
     def initialize(env)
       @env = env
+      @routing_params = {}
     end
 
     def env
@@ -19,7 +20,7 @@ module Rulers
     end
 
     def params
-      request.params
+      request.params.merge @routing_params
     end
 
     def render(view_name, locals = {})
@@ -41,6 +42,23 @@ module Rulers
 
     def render_response(*args)
       response(render(*args))
+    end
+
+    def dispatch(action, routing_params = {})
+      @routing_params = routing_params
+      self.send(action)
+      if get_response
+        st, hd, rs = get_response.to_a
+        hd['Content-Type'] = 'text/html'
+        [st, hd, [rs.body].flatten]
+      else
+        text = self.send(:render, act.to_sym)
+        [200, {'Content-Type' => 'text/html'}, [text]]
+      end
+    end
+
+    def self.action(act, rp = {})
+      proc { |e| self.new(e).dispatch(act, rp) }
     end
 
     private
