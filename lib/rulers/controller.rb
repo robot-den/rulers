@@ -52,7 +52,7 @@ module Rulers
         hd['Content-Type'] = 'text/html'
         [st, hd, [rs.body].flatten]
       else
-        text = self.send(:render, act.to_sym)
+        text = self.send(:render, action.to_sym)
         [200, {'Content-Type' => 'text/html'}, [text]]
       end
     end
