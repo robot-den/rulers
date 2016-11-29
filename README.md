@@ -1,28 +1,29 @@
 # Rulers
 
-Это учебный gem по книге Noah Gibbs'а "Rebuilding Rails". Версия книги: Aug 4, 2013
+It is gem and application by Noah Gibbs's book "Rebuilding Rails". Book version: Aug 4, 2013
 
 ## Installation
+<pre>
+$ bundle
+-- or --
+$ gem install rulers
+</pre>
 
+## Usage
 ```ruby
 gem 'rulers'
 ```
-    $ bundle
-    -- or --
-    $ gem install rulers
-
-## Usage
 <pre>
 ¯\_(ツ)_/¯
 </pre>
 
 ## Development
-Важно добавить в .gitignore собранный gem, чтобы не получить `Error: contains itself`
+It is important to add gem's file in .gitignore, otherwise build will raise `Error: contains itself`
 
-    # создать
+    # create
     $ bundle gem rulers
 
-    # собрать
+    # make and install
     $ git add .
     $ gem build rulers.gemspec
     $ gem install rulers-0.0.1.gem
