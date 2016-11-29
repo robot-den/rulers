@@ -3,9 +3,13 @@ class RouterObject
     @rules = []
   end
 
+  def root(url = '/', *args)
+    match(url, *args)
+  end
+
   def match(url, *args)
     options = {}
-    options = args.pop if args[-1].is_a? Hash
+    options = args.pop if args[-1].is_a?(Hash)
     options[:default] ||= {}
     dest = nil
     dest = args.pop if args.size > 0
@@ -38,15 +42,12 @@ class RouterObject
       m = rule[:regexp].match(url)
       if m
         options = rule[:options]
-        params = rule[:default].dup
+        params = options[:default].dup
         rule[:vars].each_with_index do |v, i|
           params[v] = m.captures[i]
         end
         dest = nil
-        puts rule[:dest]
-        puts '---------------------------------------'
         if rule[:dest]
-          puts '---------------------------------------'
           return get_dest(rule[:dest], params)
         else
           controller = params['controller']
@@ -61,7 +62,7 @@ class RouterObject
   def get_dest(dest, routing_params = {})
     return dest if dest.respond_to?(:call)
     if dest =~ /^([^#]+)#([^#]+)$/
-      name = $1.capitalise
+      name = $1.capitalize
       cont = Object.const_get("#{name}Controller")
       return cont.action($2, routing_params)
     end

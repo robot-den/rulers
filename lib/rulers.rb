@@ -9,9 +9,9 @@ module Rulers
     def call(env)
       return [404, {'Content-Type' => 'text/html'}, []] if env['PATH_INFO'] == '/favicon.ico'
       # return [301, {'Content-Type' => 'text/html', 'Location' => 'http://localhost:3001/quotes/index'}, []] if env['PATH_INFO'] == '/'
-      klass, act = get_controller_and_action(env)
-      rack_app = klass.action(act)
-      rack_app.call(env)
+      # klass, act = get_controller_and_action(env)
+      rack_app = get_rack_app(env)
+      rack_app.call
     end
 
     # routing methods
